@@ -30,4 +30,4 @@ gcloud compute firewall-rules create default-allow-http-5000 \
     --description "Allow port 5000 access to http-server"
 
 # Check the progress of the instance creation:
-gcloud compute instances get-serial-port-output $MY_INSTANCE_NAME --zone $ZONE
+# gcloud compute instances get-serial-port-output $MY_INSTANCE_NAME --zone $ZONE

@@ -56,9 +56,9 @@ useradd -m -d /home/sarai sarai
 
 # Install sarai
 echo "======="
-echo "Installing sarai..."
+echo "Installing sarai with pipe bash..."
 echo "======="
-sudo bash <(wget -qO- https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/webui.sh)
+curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/webui.sh | bash
 
 # Set ownership to newly created account
 echo "======="
