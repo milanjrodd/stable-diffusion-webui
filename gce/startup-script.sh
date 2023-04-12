@@ -58,7 +58,8 @@ useradd -m -d /home/sarai sarai
 echo "======="
 echo "Installing sarai with pipe bash..."
 echo "======="
-curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/webui.sh | bash
+su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/webui.sh | bash"
+
 
 # Set ownership to newly created account
 echo "======="
