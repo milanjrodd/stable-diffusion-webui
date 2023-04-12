@@ -4,7 +4,7 @@
 TAG=$(openssl rand -base64 8 | tr '[:upper:]' '[:lower:]' | tr -dc 'a-z0-9' | head -c 4)
 
 # Set the instance name and zone
-MY_INSTANCE_NAME="style-a-room-ai-${TAG}"
+MY_INSTANCE_NAME="sarai-${TAG}"
 ZONE=us-central1-a
 
 echo "Creating instance ${MY_INSTANCE_NAME} in zone ${ZONE}"
