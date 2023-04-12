@@ -22,5 +22,12 @@ gcloud compute instances create $MY_INSTANCE_NAME \
     --maintenance-policy TERMINATE --restart-on-failure \
     --boot-disk-size=200GB \
 
+# Create a firewall rule to allow HTTP traffic on port 5000
+gcloud compute firewall-rules create default-allow-http-5000 \
+    --allow tcp:5000 \
+    --source-ranges 0.0.0.0/0 \
+    --target-tags http-server \
+    --description "Allow port 5000 access to http-server"
+
 # Check the progress of the instance creation:
 gcloud compute instances get-serial-port-output $MY_INSTANCE_NAME --zone $ZONE

@@ -39,8 +39,8 @@ chown -R sarai:sarai /opt/sarai
 # Create a Supervisor configuration file for sarai
 cat > /etc/supervisor/conf.d/sarai.conf << EOL
 [program:sarai]
-command=/opt/sarai/webui.sh --api --theme light --port 5000
-directory=/opt/sarai
+command=/opt/sarai/stable-diffusion-webui/webui.sh --api --theme light --port 5000 --listen
+directory=/opt/sarai/stable-diffusion-webui
 user=sarai
 autostart=true
 autorestart=true
