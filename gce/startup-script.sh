@@ -40,7 +40,7 @@ chown -R sarai:sarai /opt/sarai
 cat > /etc/supervisor/conf.d/sarai.conf << EOL
 [program:sarai]
 command=/opt/sarai/webui.sh --api --theme light --port 5000
-directory=/home/sarai
+directory=/opt/sarai
 user=sarai
 autostart=true
 autorestart=true
