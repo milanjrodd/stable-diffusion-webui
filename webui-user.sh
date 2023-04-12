@@ -4,7 +4,7 @@
 #########################################################
 
 # Install directory without trailing slash
-install_dir="/opt/sarai"
+# install_dir="/opt/sarai"
 
 # Name of the subdirectory
 #clone_dir="stable-diffusion-webui"

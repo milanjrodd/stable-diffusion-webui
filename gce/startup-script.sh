@@ -58,14 +58,14 @@ useradd -m -d /home/sarai sarai
 echo "======="
 echo "Installing sarai with pipe bash..."
 echo "======="
-su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/webui.sh | bash"
+su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/install.sh | bash"
 
 
 # Set ownership to newly created account
 echo "======="
 echo "Setting ownership to newly created account..."
 echo "======="
-chown -R sarai:sarai /opt/sarai
+chown -R sarai:sarai /home/sarai
 
 # Create a Supervisor configuration file for sarai
 echo "======="
@@ -73,8 +73,8 @@ echo "Creating a Supervisor configuration file for sarai..."
 echo "======="
 cat > /etc/supervisor/conf.d/sarai.conf << EOL
 [program:sarai]
-command=/opt/sarai/stable-diffusion-webui/webui.sh --api --theme light --port 5000 --listen
-directory=/opt/sarai/stable-diffusion-webui
+command=/home/sarai/stable-diffusion-webui/webui.sh --api --theme light --port 5000 --listen
+directory=/home/sarai/stable-diffusion-webui
 user=sarai
 autostart=true
 autorestart=true
