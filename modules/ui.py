@@ -168,7 +168,7 @@ def interrogate_deepbooru(image):
 
 
 def create_seed_inputs(target_interface):
-    with FormRow(elem_id=target_interface + '_seed_row', variant="compact"):
+    with FormRow(elem_id=target_interface + '_seed_row', variant="compact", visible=False):
         seed = (gr.Textbox if cmd_opts.use_textbox_seed else gr.Number)(label='Seed', value=-1, elem_id=target_interface + '_seed')
         seed.style(container=False)
         random_seed = ToolButton(random_symbol, elem_id=target_interface + '_random_seed')
@@ -274,19 +274,19 @@ def create_toprow(is_img2img):
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        prompt = gr.Textbox(label="Prompt", elem_id=f"{id_part}_prompt", show_label=False, lines=3, placeholder="Prompt (press Ctrl+Enter or Alt+Enter to generate)")
+                        prompt = gr.Textbox(label="Prompt", elem_id=f"{id_part}_prompt", show_label=False, lines=3, placeholder="Describe what you’d like to see in the image (e.g “minimalist style kitchen”)")
 
             with gr.Row():
                 with gr.Column(scale=80):
                     with gr.Row():
-                        negative_prompt = gr.Textbox(label="Negative prompt", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=3, placeholder="Negative prompt (press Ctrl+Enter or Alt+Enter to generate)")
+                        negative_prompt = gr.Textbox(label="Negative prompt", elem_id=f"{id_part}_neg_prompt", show_label=False, lines=3, placeholder="Tell us the object(s) you would not like to see (e.g. “chairs”, “plants”)")
 
         button_interrogate = None
         button_deepbooru = None
         if is_img2img:
             with gr.Column(scale=1, elem_classes="interrogate-col"):
-                button_interrogate = gr.Button('Interrogate\nCLIP', elem_id="interrogate")
-                button_deepbooru = gr.Button('Interrogate\nDeepBooru', elem_id="deepbooru")
+                button_interrogate = gr.Button('Interrogate\nCLIP', visible=False, elem_id="interrogate" )
+                button_deepbooru = gr.Button('Interrogate\nDeepBooru', visible=False, elem_id="deepbooru")
 
         with gr.Column(scale=1, elem_id=f"{id_part}_actions_column"):
             with gr.Row(elem_id=f"{id_part}_generate_box", elem_classes="generate-box"):
@@ -307,11 +307,11 @@ def create_toprow(is_img2img):
                 )
 
             with gr.Row(elem_id=f"{id_part}_tools"):
-                paste = ToolButton(value=paste_symbol, elem_id="paste")
-                clear_prompt_button = ToolButton(value=clear_prompt_symbol, elem_id=f"{id_part}_clear_prompt")
-                extra_networks_button = ToolButton(value=extra_networks_symbol, elem_id=f"{id_part}_extra_networks")
-                prompt_style_apply = ToolButton(value=apply_style_symbol, elem_id=f"{id_part}_style_apply")
-                save_style = ToolButton(value=save_style_symbol, elem_id=f"{id_part}_style_create")
+                paste = ToolButton(visible=False, value=paste_symbol, elem_id="paste")
+                clear_prompt_button = ToolButton(visible=False, value=clear_prompt_symbol, elem_id=f"{id_part}_clear_prompt")
+                extra_networks_button = ToolButton(visible=False, value=extra_networks_symbol, elem_id=f"{id_part}_extra_networks")
+                prompt_style_apply = ToolButton(visible=False, value=apply_style_symbol, elem_id=f"{id_part}_style_apply")
+                save_style = ToolButton(visible=False, value=save_style_symbol, elem_id=f"{id_part}_style_create")
 
                 token_counter = gr.HTML(value="<span>0/75</span>", elem_id=f"{id_part}_token_counter", elem_classes=["token-counter"])
                 token_button = gr.Button(visible=False, elem_id=f"{id_part}_token_button")
@@ -395,11 +395,11 @@ def create_output_panel(tabname, outdir):
 def create_sampler_and_steps_selection(choices, tabname):
     if opts.samplers_in_dropdown:
         with FormRow(elem_id=f"sampler_selection_{tabname}"):
-            sampler_index = gr.Dropdown(label='Sampling method', elem_id=f"{tabname}_sampling", choices=[x.name for x in choices], value=choices[0].name, type="index")
-            steps = gr.Slider(minimum=1, maximum=150, step=1, elem_id=f"{tabname}_steps", label="Sampling steps", value=20)
+            sampler_index = gr.Dropdown(label='Sampling method', elem_id=f"{tabname}_sampling", choices=[x.name for x in choices], value=choices[0].name, type="index", visible=False)
+            steps = gr.Slider(minimum=25, maximum=50, step=1, elem_id=f"{tabname}_steps", label="Image quality", value=25)
     else:
         with FormGroup(elem_id=f"sampler_selection_{tabname}"):
-            steps = gr.Slider(minimum=1, maximum=150, step=1, elem_id=f"{tabname}_steps", label="Sampling steps", value=20)
+            steps = gr.Slider(minimum=25, maximum=50, step=1, elem_id=f"{tabname}_steps", label="Image quality", value=25)
             sampler_index = gr.Radio(label='Sampling method', elem_id=f"{tabname}_sampling", choices=[x.name for x in choices], value=choices[0].name, type="index")
 
     return steps, sampler_index
@@ -458,34 +458,34 @@ def create_ui():
         with gr.Row().style(equal_height=False):
             with gr.Column(variant='compact', elem_id="txt2img_settings"):
                 for category in ordered_ui_categories():
-                    if category == "sampler":
+                    if category == "cfg":
+                        cfg_scale = gr.Slider(minimum=7.0, maximum=22.0, step=0.5, label='Prompt Sensitivity', value=12.0, elem_id="txt2img_cfg_scale")
+                    
+                    elif category == "sampler":
                         steps, sampler_index = create_sampler_and_steps_selection(samplers, "txt2img")
 
                     elif category == "dimensions":
                         with FormRow():
                             with gr.Column(elem_id="txt2img_column_size", scale=4):
-                                width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="txt2img_width")
-                                height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="txt2img_height")
+                                width = gr.Slider(minimum=512, maximum=1024, step=64, label="Width ", value=512, elem_id="txt2img_width")
+                                height = gr.Slider(minimum=512, maximum=1024, step=64, label="Height ", value=512, elem_id="txt2img_height")
 
                             with gr.Column(elem_id="txt2img_dimensions_row", scale=1, elem_classes="dimensions-tools"):
                                 res_switch_btn = ToolButton(value=switch_values_symbol, elem_id="txt2img_res_switch_btn")
 
                             if opts.dimensions_and_batch_together:
                                 with gr.Column(elem_id="txt2img_column_batch"):
-                                    batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="txt2img_batch_count")
-                                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="txt2img_batch_size")
-
-                    elif category == "cfg":
-                        cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0, elem_id="txt2img_cfg_scale")
+                                    batch_count = gr.Slider(minimum=1, maximum=1, step=1, label='Batch Count', value=1,  elem_id="txt2img_batch_count", visible=False)
+                                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='# of images', value=1, elem_id="txt2img_batch_size")
 
                     elif category == "seed":
                         seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs('txt2img')
 
                     elif category == "checkboxes":
                         with FormRow(elem_classes="checkboxes-row", variant="compact"):
-                            restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1, elem_id="txt2img_restore_faces")
-                            tiling = gr.Checkbox(label='Tiling', value=False, elem_id="txt2img_tiling")
-                            enable_hr = gr.Checkbox(label='Hires. fix', value=False, elem_id="txt2img_enable_hr")
+                            restore_faces = gr.Checkbox(label='Restore faces', visible=False, value=False, elem_id="txt2img_restore_faces")
+                            tiling = gr.Checkbox(label='Tiling', value=False, visible=False, elem_id="txt2img_tiling")
+                            enable_hr = gr.Checkbox(label='Hires. fix', value=False, elem_id="txt2img_enable_hr", visible=False)
                             hr_final_resolution = FormHTML(value="", elem_id="txtimg_hr_finalres", label="Upscaled resolution", interactive=False)
 
                     elif category == "hires_fix":
@@ -493,7 +493,7 @@ def create_ui():
                             with FormRow(elem_id="txt2img_hires_fix_row1", variant="compact"):
                                 hr_upscaler = gr.Dropdown(label="Upscaler", elem_id="txt2img_hr_upscaler", choices=[*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]], value=shared.latent_upscale_default_mode)
                                 hr_second_pass_steps = gr.Slider(minimum=0, maximum=150, step=1, label='Hires steps', value=0, elem_id="txt2img_hires_steps")
-                                denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.7, elem_id="txt2img_denoising_strength")
+                                denoising_strength = gr.Slider(minimum=0.35, maximum=0.65, step=0.01, label='Creative Freedom', value=0.7, elem_id="txt2img_denoising_strength")
 
                             with FormRow(elem_id="txt2img_hires_fix_row2", variant="compact"):
                                 hr_scale = gr.Slider(minimum=1.0, maximum=4.0, step=0.05, label="Upscale by", value=2.0, elem_id="txt2img_hr_scale")
@@ -660,7 +660,7 @@ def create_ui():
                 copy_image_destinations = {}
 
                 def add_copy_image_controls(tab_name, elem):
-                    with gr.Row(variant="compact", elem_id=f"img2img_copy_to_{tab_name}"):
+                    with gr.Row(variant="compact", elem_id=f"img2img_copy_to_{tab_name}", visible=False):
                         gr.HTML("Copy image to: ", elem_id=f"img2img_label_copy_to_{tab_name}")
 
                         for title, name in zip(['img2img', 'sketch', 'inpaint', 'inpaint sketch'], ['img2img', 'sketch', 'inpaint', 'inpaint_sketch']):
@@ -673,19 +673,21 @@ def create_ui():
                             copy_image_buttons.append((button, name, elem))
 
                 with gr.Tabs(elem_id="mode_img2img"):
-                    with gr.TabItem('img2img', id='img2img', elem_id="img2img_img2img_tab") as tab_img2img:
+                    with gr.TabItem('Upload Image', id='img2img', elem_id="img2img_img2img_tab") as tab_img2img:
                         init_img = gr.Image(label="Image for img2img", elem_id="img2img_image", show_label=False, source="upload", interactive=True, type="pil", tool="editor", image_mode="RGBA").style(height=480)
                         add_copy_image_controls('img2img', init_img)
 
-                    with gr.TabItem('Sketch', id='img2img_sketch', elem_id="img2img_img2img_sketch_tab") as tab_sketch:
-                        sketch = gr.Image(label="Image for img2img", elem_id="img2img_sketch", show_label=False, source="upload", interactive=True, type="pil", tool="color-sketch", image_mode="RGBA").style(height=480)
-                        add_copy_image_controls('sketch', sketch)
-
-                    with gr.TabItem('Inpaint', id='inpaint', elem_id="img2img_inpaint_tab") as tab_inpaint:
+                    with gr.TabItem('Edit Selected Area', id='inpaint', elem_id="img2img_inpaint_tab") as tab_inpaint:
                         init_img_with_mask = gr.Image(label="Image for inpainting with mask", show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA").style(height=480)
                         add_copy_image_controls('inpaint', init_img_with_mask)
 
-                    with gr.TabItem('Inpaint sketch', id='inpaint_sketch', elem_id="img2img_inpaint_sketch_tab") as tab_inpaint_color:
+                    with gr.TabItem('', id='img2img_sketch', elem_id="img2img_img2img_sketch_tab") as tab_sketch:
+                        sketch = gr.Image(label="Image for img2img", elem_id="img2img_sketch", show_label=False, source="upload", interactive=True, type="pil", tool="color-sketch", image_mode="RGBA").style(height=480)
+                        add_copy_image_controls('sketch', sketch)
+
+                    
+
+                    with gr.TabItem('', id='inpaint_sketch', elem_id="img2img_inpaint_sketch_tab") as tab_inpaint_color:
                         inpaint_color_sketch = gr.Image(label="Color sketch inpainting", show_label=False, elem_id="inpaint_sketch", source="upload", interactive=True, type="pil", tool="color-sketch", image_mode="RGBA").style(height=480)
                         inpaint_color_sketch_orig = gr.State(None)
                         add_copy_image_controls('inpaint_sketch', inpaint_color_sketch)
@@ -699,11 +701,11 @@ def create_ui():
 
                         inpaint_color_sketch.change(update_orig, [inpaint_color_sketch, inpaint_color_sketch_orig], inpaint_color_sketch_orig)
 
-                    with gr.TabItem('Inpaint upload', id='inpaint_upload', elem_id="img2img_inpaint_upload_tab") as tab_inpaint_upload:
+                    with gr.TabItem('', id='inpaint_upload', elem_id="img2img_inpaint_upload_tab") as tab_inpaint_upload:
                         init_img_inpaint = gr.Image(label="Image for img2img", show_label=False, source="upload", interactive=True, type="pil", elem_id="img_inpaint_base")
                         init_mask_inpaint = gr.Image(label="Mask", source="upload", interactive=True, type="pil", elem_id="img_inpaint_mask")
 
-                    with gr.TabItem('Batch', id='batch', elem_id="img2img_batch_tab") as tab_batch:
+                    with gr.TabItem('', id='batch', elem_id="img2img_batch_tab") as tab_batch:
                         hidden = '<br>Disabled when launched with --hide-ui-dir-config.' if shared.cmd_opts.hide_ui_dir_config else ''
                         gr.HTML(
                             f"<p style='padding-bottom: 1em;' class=\"text-gray-500\">Process images in a directory on the same machine where the server is running." +
@@ -735,7 +737,7 @@ def create_ui():
                     )
 
                 with FormRow():
-                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", choices=["Just resize", "Crop and resize", "Resize and fill", "Just resize (latent upscale)"], type="index", value="Just resize")
+                    resize_mode = gr.Radio(label="Resize mode", elem_id="resize_mode", choices=["Just resize", "Crop and resize", "Resize and fill", "Just resize (latent upscale)"], type="index", value="Crop and resize", visible=False)
 
                 for category in ordered_ui_categories():
                     if category == "sampler":
@@ -744,31 +746,31 @@ def create_ui():
                     elif category == "dimensions":
                         with FormRow():
                             with gr.Column(elem_id="img2img_column_size", scale=4):
-                                width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="img2img_width")
-                                height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="img2img_height")
+                                width = gr.Slider(minimum=512, maximum=1024, step=64, label="Width ", value=512, elem_id="img2img_width")
+                                height = gr.Slider(minimum=512, maximum=1024, step=64, label="Height ", value=512, elem_id="img2img_height")
 
                             with gr.Column(elem_id="img2img_dimensions_row", scale=1, elem_classes="dimensions-tools"):
                                 res_switch_btn = ToolButton(value=switch_values_symbol, elem_id="img2img_res_switch_btn")
 
                             if opts.dimensions_and_batch_together:
                                 with gr.Column(elem_id="img2img_column_batch"):
-                                    batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="img2img_batch_count")
-                                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="img2img_batch_size")
+                                    batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="img2img_batch_count", visible=False)
+                                    batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='# of Images', value=1, elem_id="img2img_batch_size")
 
                     elif category == "cfg":
                         with FormGroup():
                             with FormRow():
-                                cfg_scale = gr.Slider(minimum=1.0, maximum=30.0, step=0.5, label='CFG Scale', value=7.0, elem_id="img2img_cfg_scale")
-                                image_cfg_scale = gr.Slider(minimum=0, maximum=3.0, step=0.05, label='Image CFG Scale', value=1.5, elem_id="img2img_image_cfg_scale", visible=shared.sd_model and shared.sd_model.cond_stage_key == "edit")
-                            denoising_strength = gr.Slider(minimum=0.0, maximum=1.0, step=0.01, label='Denoising strength', value=0.75, elem_id="img2img_denoising_strength")
+                                cfg_scale = gr.Slider(minimum=7.0, maximum=22.0, step=0.5, value=12.0, label='Prompt Sensitivity', elem_id="img2img_cfg_scale")
+                                image_cfg_scale = gr.Slider(minimum=7.0, maximum=22.0, step=0.5, value=12.0,  label='Image Prompt Sensitivity', elem_id="img2img_image_cfg_scale", visible=shared.sd_model and shared.sd_model.cond_stage_key == "edit")
+                            denoising_strength = gr.Slider(minimum=0.35, maximum=0.65, step=0.01, label='Creative Freedom', value=0.45, elem_id="img2img_denoising_strength")
 
                     elif category == "seed":
                         seed, reuse_seed, subseed, reuse_subseed, subseed_strength, seed_resize_from_h, seed_resize_from_w, seed_checkbox = create_seed_inputs('img2img')
 
                     elif category == "checkboxes":
                         with FormRow(elem_classes="checkboxes-row", variant="compact"):
-                            restore_faces = gr.Checkbox(label='Restore faces', value=False, visible=len(shared.face_restorers) > 1, elem_id="img2img_restore_faces")
-                            tiling = gr.Checkbox(label='Tiling', value=False, elem_id="img2img_tiling")
+                            restore_faces = gr.Checkbox(visible=False, label='Restore faces', value=False, elem_id="img2img_restore_faces")
+                            tiling = gr.Checkbox(visible=False, label='Tiling', value=False, elem_id="img2img_tiling")
 
                     elif category == "batch":
                         if not opts.dimensions_and_batch_together:
@@ -787,16 +789,16 @@ def create_ui():
                     elif category == "inpaint":
                         with FormGroup(elem_id="inpaint_controls", visible=False) as inpaint_controls:
                             with FormRow():
-                                mask_blur = gr.Slider(label='Mask blur', minimum=0, maximum=64, step=1, value=4, elem_id="img2img_mask_blur")
+                                mask_blur = gr.Slider(label='Mask blur', minimum=0, maximum=64, step=1, value=4,  visible=False, elem_id="img2img_mask_blur")
                                 mask_alpha = gr.Slider(label="Mask transparency", visible=False, elem_id="img2img_mask_alpha")
 
                             with FormRow():
-                                inpainting_mask_invert = gr.Radio(label='Mask mode', choices=['Inpaint masked', 'Inpaint not masked'], value='Inpaint masked', type="index", elem_id="img2img_mask_mode")
+                                inpainting_mask_invert = gr.Radio(label='Edit mode', choices=['Transform highlighted area', 'Protect highlighted area'], value='Transform highlighted area', type="index", elem_id="img2img_mask_mode")
 
                             with FormRow():
-                                inpainting_fill = gr.Radio(label='Masked content', choices=['fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index", elem_id="img2img_inpainting_fill")
+                                inpainting_fill = gr.Radio(label='Masked content', choices=['fill', 'original', 'latent noise', 'latent nothing'], value='original', type="index", elem_id="img2img_inpainting_fill", visible=False)
 
-                            with FormRow():
+                            with FormRow(visible=False):
                                 with gr.Column():
                                     inpaint_full_res = gr.Radio(label="Inpaint area", choices=["Whole picture", "Only masked"], type="index", value="Whole picture", elem_id="img2img_inpaint_full_res")
 
@@ -1082,8 +1084,8 @@ def create_ui():
                 with gr.Tab(label="Preprocess images"):
                     process_src = gr.Textbox(label='Source directory', elem_id="train_process_src")
                     process_dst = gr.Textbox(label='Destination directory', elem_id="train_process_dst")
-                    process_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="train_process_width")
-                    process_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="train_process_height")
+                    process_width = gr.Slider(minimum=512, maximum=1024, step=64, label="Width ", value=512, elem_id="train_process_width")
+                    process_height = gr.Slider(minimum=512, maximum=1024, step=64, label="Height ", value=512, elem_id="train_process_height")
                     preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"], elem_id="train_preprocess_txt_action")
 
                     with gr.Row():
@@ -1174,8 +1176,8 @@ def create_ui():
                         template_file = gr.Dropdown(label='Prompt template', value="style_filewords.txt", elem_id="train_template_file", choices=get_textual_inversion_template_names())
                         create_refresh_button(template_file, textual_inversion.list_textual_inversion_templates, lambda: {"choices": get_textual_inversion_template_names()}, "refrsh_train_template_file")
 
-                    training_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="train_training_width")
-                    training_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="train_training_height")
+                    training_width = gr.Slider(minimum=512, maximum=1024, step=64, label="Width ", value=512, elem_id="train_training_width")
+                    training_height = gr.Slider(minimum=512, maximum=1024, step=64, label="Height ", value=512, elem_id="train_training_height")
                     varsize = gr.Checkbox(label="Do not resize images", value=False, elem_id="train_varsize")
                     steps = gr.Number(label='Max steps', value=100000, precision=0, elem_id="train_steps")
 
@@ -1547,26 +1549,30 @@ def create_ui():
         )
 
     interfaces = [
-        (txt2img_interface, "txt2img", "txt2img"),
-        (img2img_interface, "img2img", "img2img"),
-        (extras_interface, "Extras", "extras"),
-        (pnginfo_interface, "PNG Info", "pnginfo"),
-        (modelmerger_interface, "Checkpoint Merger", "modelmerger"),
-        (train_interface, "Train", "ti"),
+        (txt2img_interface, "Describe and Create", "txt2img"),
+        (img2img_interface, "Transform interior", "img2img"),
+        (extras_interface, "", "extras"),
+        (pnginfo_interface, "", "pnginfo"),
+        (modelmerger_interface, "", "modelmerger"),
+        (train_interface, "", "ti"),
     ]
 
     interfaces += script_callbacks.ui_tabs_callback()
-    interfaces += [(settings_interface, "Settings", "settings")]
+    interfaces += [(settings_interface, "", "settings")]
 
     extensions_interface = ui_extensions.create_ui()
-    interfaces += [(extensions_interface, "Extensions", "extensions")]
+    interfaces += [(extensions_interface, "", "extensions")]
 
     shared.tab_names = []
     for _interface, label, _ifid in interfaces:
         shared.tab_names.append(label)
 
-    with gr.Blocks(analytics_enabled=False, title="Stable Diffusion") as demo:
-        with gr.Row(elem_id="quicksettings", variant="compact"):
+    with gr.Blocks(analytics_enabled=False, title="Style a Room | AI-generated Interiors") as demo:
+        footer = shared.html("footer.html")
+        footer = footer.format(versions=versions_html(), logo=logo_html())
+        gr.HTML(footer, elem_id="footer")
+
+        with gr.Row(elem_id="quicksettings", variant="compact", visible=False):
             for i, k, item in sorted(quicksettings_list, key=lambda x: quicksettings_names.get(x[1], x[0])):
                 component = create_setting_component(k, is_quicksettings=True)
                 component_dict[k] = component
@@ -1582,10 +1588,6 @@ def create_ui():
 
         if os.path.exists(os.path.join(script_path, "notification.mp3")):
             audio_notification = gr.Audio(interactive=False, value=os.path.join(script_path, "notification.mp3"), elem_id="audio_notification", visible=False)
-
-        footer = shared.html("footer.html")
-        footer = footer.format(versions=versions_html())
-        gr.HTML(footer, elem_id="footer")
 
         text_settings = gr.Textbox(elem_id="settings_json", value=lambda: opts.dumpjson(), visible=False)
         settings_submit.click(
@@ -1842,3 +1844,17 @@ commit: <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui/commit/
  • 
 checkpoint: <a id="sd_checkpoint_hash">N/A</a>
 """
+
+def get_logo_path():
+    logo = os.path.join(script_path,"ui", "Logo.png")
+    if os.path.exists(logo):
+        return logo
+    else:
+        return None
+    
+def logo_html():
+    logo = get_logo_path()
+    if logo is not None:
+        return f'<img src="{webpath(logo)}" style="height: 100%; width: 100%; object-fit: contain">'
+    else:
+        return ""

@@ -42,12 +42,12 @@ restricted_opts = {
 }
 
 ui_reorder_categories = [
+    "cfg",
     "inpaint",
     "sampler",
     "checkboxes",
     "hires_fix",
     "dimensions",
-    "cfg",
     "seed",
     "batch",
     "override_settings",
