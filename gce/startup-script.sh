@@ -28,6 +28,14 @@ echo "Upgrading pip..."
 echo "======="
 pip3 install --upgrade pip
 
+# Install xformers
+echo "======="
+echo "Installing xformers..."
+echo "======="
+pip3 install xformers==0.0.16rc425
+pip3 install triton
+sudo python3 -m xformers.info output
+
 # Install Cloud Ops Agent
 echo "======="
 echo "Installing Cloud Ops Agent..."
