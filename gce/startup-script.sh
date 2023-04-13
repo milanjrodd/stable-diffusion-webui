@@ -28,14 +28,6 @@ echo "Upgrading pip..."
 echo "======="
 pip3 install --upgrade pip
 
-# Install xformers
-echo "======="
-echo "Installing xformers..."
-echo "======="
-pip3 install xformers==0.0.16rc425
-pip3 install triton
-sudo python3 -m xformers.info output
-
 # Install Cloud Ops Agent
 echo "======="
 echo "Installing Cloud Ops Agent..."
@@ -61,7 +53,6 @@ echo "======="
 echo "Creating account to own server process..."
 echo "======="
 useradd -m -d /home/sarai sarai
-sudo setfacl -R -m u:milanrodd:rw /home/sarai
 
 # Install sarai
 echo "======="
@@ -72,14 +63,14 @@ su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffu
 # Install models
 echo "======="
 echo "Installing models..."
-echo "======="
-su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/download-models.sh | bash -s -- /home/sarai/stable-diffusion-webui/models/Stable-diffusion"
+curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/download-models.sh | bash -s -- /home/sarai/stable-diffusion-webui/models/Stable-diffusion
 
 # Set ownership to newly created account
 echo "======="
 echo "Setting ownership to newly created account..."
 echo "======="
 chown -R sarai:sarai /home/sarai
+sudo setfacl -R -m u:milanrodd:rw /home/sarai
 
 # Create a Supervisor configuration file for sarai
 echo "======="
@@ -87,7 +78,7 @@ echo "Creating a Supervisor configuration file for sarai..."
 echo "======="
 cat > /etc/supervisor/conf.d/sarai.conf << EOL
 [program:sarai]
-command=/home/sarai/stable-diffusion-webui/webui.sh --api --theme light --port 5000 --listen
+command=/home/sarai/stable-diffusion-webui/webui.sh --api --theme light --port 5000 --listen --xformers
 directory=/home/sarai/stable-diffusion-webui
 user=sarai
 autostart=true
