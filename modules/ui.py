@@ -677,15 +677,13 @@ def create_ui():
                         init_img = gr.Image(label="Image for img2img", elem_id="img2img_image", show_label=False, source="upload", interactive=True, type="pil", tool="editor", image_mode="RGBA").style(height=480)
                         add_copy_image_controls('img2img', init_img)
 
-                    with gr.TabItem('Edit Selected Area', id='inpaint', elem_id="img2img_inpaint_tab") as tab_inpaint:
-                        init_img_with_mask = gr.Image(label="Image for inpainting with mask", show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA").style(height=480)
-                        add_copy_image_controls('inpaint', init_img_with_mask)
-
                     with gr.TabItem('', id='img2img_sketch', elem_id="img2img_img2img_sketch_tab") as tab_sketch:
                         sketch = gr.Image(label="Image for img2img", elem_id="img2img_sketch", show_label=False, source="upload", interactive=True, type="pil", tool="color-sketch", image_mode="RGBA").style(height=480)
                         add_copy_image_controls('sketch', sketch)
 
-                    
+                    with gr.TabItem('Edit Selected Area', id='inpaint', elem_id="img2img_inpaint_tab") as tab_inpaint:
+                        init_img_with_mask = gr.Image(label="Image for inpainting with mask", show_label=False, elem_id="img2maskimg", source="upload", interactive=True, type="pil", tool="sketch", image_mode="RGBA").style(height=480)
+                        add_copy_image_controls('inpaint', init_img_with_mask)
 
                     with gr.TabItem('', id='inpaint_sketch', elem_id="img2img_inpaint_sketch_tab") as tab_inpaint_color:
                         inpaint_color_sketch = gr.Image(label="Color sketch inpainting", show_label=False, elem_id="inpaint_sketch", source="upload", interactive=True, type="pil", tool="color-sketch", image_mode="RGBA").style(height=480)
