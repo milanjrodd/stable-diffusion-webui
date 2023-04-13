@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Generate a random 4-symbol tag that matches the regex
-TAG=$(openssl rand -base64 8 | tr '[:upper:]' '[:lower:]' | tr -dc 'a-z0-9' | head -c 4)
+# Generate a tag out of date
+TAG=$(date +%Y%m%d%H%M%S)
 
 # Set the instance name and zone
 MY_INSTANCE_NAME="sarai-${TAG}"

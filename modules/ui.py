@@ -1570,7 +1570,7 @@ def create_ui():
         footer = footer.format(versions=versions_html(), logo=logo_html())
         gr.HTML(footer, elem_id="footer")
 
-        with gr.Row(elem_id="quicksettings", variant="compact", visible=False):
+        with gr.Row(elem_id="quicksettings", variant="compact", visible=True):
             for i, k, item in sorted(quicksettings_list, key=lambda x: quicksettings_names.get(x[1], x[0])):
                 component = create_setting_component(k, is_quicksettings=True)
                 component_dict[k] = component
