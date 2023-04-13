@@ -5,7 +5,7 @@ echo "======="
 echo "Installing or updating needed software..."
 echo "======="
 apt-get update
-apt-get install -yq supervisor wget git python3 python3-venv software-properties-common
+apt-get install -yq supervisor wget git python3 python3-venv software-properties-common acl
 
 # Install Python 3.10
 echo "======="
@@ -53,13 +53,19 @@ echo "======="
 echo "Creating account to own server process..."
 echo "======="
 useradd -m -d /home/sarai sarai
+sudo setfacl -R -m u:milanrodd:rw /home/sarai
 
 # Install sarai
 echo "======="
-echo "Installing sarai with pipe bash..."
+echo "Installing sarai..."
 echo "======="
 su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/install.sh | bash"
 
+# Install models
+echo "======="
+echo "Installing models..."
+echo "======="
+su - sarai -c "curl -s https://raw.githubusercontent.com/milanjrodd/stable-diffusion-webui/master/download-models.sh | bash -s -- /home/sarai/stable-diffusion-webui/models/Stable-diffusion"
 
 # Set ownership to newly created account
 echo "======="
